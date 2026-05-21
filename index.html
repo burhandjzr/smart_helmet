@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width,
+          initial-scale=1.0">
+
+    <title>
+        Smart Helmet Dashboard
+    </title>
+
+    <!-- SUPABASE -->
+    <script src=
+"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <!-- LEAFLET -->
+    <link rel="stylesheet"
+          href=
+"https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+    <script src=
+"https://unpkg.com/leaflet/dist/leaflet.js">
+    </script>
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="style.css">
+
+</head>
+
+<body>
+
+<!-- ========================= -->
+<!-- NAVBAR -->
+<!-- ========================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        SMART HELMET
+
+    </div>
+
+    <div class="nav-links">
+
+        <a href="index.html"
+           class="active">
+
+            Dashboard
+
+        </a>
+
+        <a href="logs.html">
+
+            Event Logs
+
+        </a>
+
+    </div>
+
+</nav>
+
+<!-- ========================= -->
+<!-- MAIN CONTENT -->
+<!-- ========================= -->
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <header>
+
+        <h1>
+            DASHBOARD
+        </h1>
+
+        <p>
+            Industrial IoT Monitoring System
+        </p>
+
+    </header>
+
+    <!-- ========================= -->
+    <!-- DASHBOARD GRID -->
+    <!-- ========================= -->
+
+    <div class="grid">
+
+        <!-- DEVICE ID -->
+
+        <div class="card">
+
+            <h3>
+                Device ID
+            </h3>
+
+            <p id="device_id">
+                -
+            </p>
+
+        </div>
+
+        <!-- EYE STATUS -->
+
+        <div class="card">
+
+            <h3>
+                Eye Status
+            </h3>
+
+            <p id="eye_status">
+                -
+            </p>
+
+        </div>
+
+        <!-- DROWSINESS -->
+
+        <div class="card">
+
+            <h3>
+                Drowsiness
+            </h3>
+
+            <p id="drowsiness_status">
+                -
+            </p>
+
+        </div>
+
+        <!-- ACCIDENT -->
+
+        <div class="card">
+
+            <h3>
+                Accident
+            </h3>
+
+            <p id="accident_status">
+                -
+            </p>
+
+        </div>
+
+        <!-- HELMET ACTIVITY -->
+
+        <div class="card">
+
+            <h3>
+                Helmet Activity
+            </h3>
+
+            <p id="helmet_activity_status">
+                -
+            </p>
+
+        </div>
+
+        <!-- SYSTEM CONTROL -->
+
+        <div class="card">
+
+            <h3>
+                System Control
+            </h3>
+
+            <label class="switch">
+
+                <input type="checkbox"
+                    id="system_toggle">
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+        <!-- GYROSCOPE -->
+
+        <div class="card gyro">
+
+            <h3>
+                Gyroscope Data
+            </h3>
+
+            <p>
+
+                X :
+                <span id="gyro_x">
+                    -
+                </span>
+
+            </p>
+
+            <p>
+
+                Y :
+                <span id="gyro_y">
+                    -
+                </span>
+
+            </p>
+
+            <p>
+
+                Z :
+                <span id="gyro_z">
+                    -
+                </span>
+
+            </p>
+
+        </div>
+
+        <!-- LAST UPDATE -->
+
+        <div class="card">
+
+            <h3>
+                Last Update
+            </h3>
+
+            <p id="updated_at">
+                -
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- MAP -->
+    <!-- ========================= -->
+
+    <div class="map-card">
+
+        <h3>
+            Worker Location
+        </h3>
+
+        <div id="map"></div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- EVENT LOG -->
+    <!-- ========================= -->
+
+    <div class="event-card">
+
+        <h3>
+            Realtime Event Log
+        </h3>
+
+        <div id="event_log">
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================= -->
+
+<script src="app.js"></script>
+
+</body>
+</html>
