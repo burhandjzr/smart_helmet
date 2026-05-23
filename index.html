@@ -1,276 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width,
-          initial-scale=1.0">
-
-    <title>
-        Smart Helmet Dashboard
-    </title>
-
-    <!-- SUPABASE -->
-    <script src=
-"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
-
-    <!-- LEAFLET -->
-    <link rel="stylesheet"
-          href=
-"https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-    <script src=
-"https://unpkg.com/leaflet/dist/leaflet.js">
-    </script>
-
-    <!-- CSS -->
-    <link rel="stylesheet"
-          href="style.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Helmet - Main Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .clickable-card {
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .clickable-card:hover {
+            transform: translateY(-5px);
+            background: #24324d;
+            border: 1px solid #3b82f6;
+        }
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .badge-inactive { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    </style>
 </head>
-
 <body>
 
-<!-- ========================= -->
-<!-- NAVBAR -->
-<!-- ========================= -->
-
 <nav class="navbar">
-
-    <div class="logo">
-
-        SMART HELMET
-
-    </div>
-
+    <div class="logo">SMART HELMET SYSTEM</div>
     <div class="nav-links">
-
-        <a href="index.html"
-           class="active">
-
-            Dashboard
-
-        </a>
-
-        <a href="logs.html">
-
-            Event Logs
-
-        </a>
-
+        <a href="index.html" class="active">Main Dashboard</a>
+        <a href="logs.html">Event Logs</a>
     </div>
-
 </nav>
 
-<!-- ========================= -->
-<!-- MAIN CONTENT -->
-<!-- ========================= -->
-
 <div class="container">
-
-    <!-- HEADER -->
-
     <header>
-
-        <h1>
-            DASHBOARD
-        </h1>
-
-        <p>
-            Industrial IoT Monitoring System
-        </p>
-
+        <h1>MAIN MONITORING</h1>
     </header>
 
-    <!-- ========================= -->
-    <!-- DASHBOARD GRID -->
-    <!-- ========================= -->
-
     <div class="grid">
-
-        <!-- DEVICE ID -->
-
-        <div class="card">
-
-            <h3>
-                Device ID
-            </h3>
-
-            <p id="device_id">
-                -
-            </p>
-
+        <div class="card clickable-card" onclick="location.href='detail.html?id=HELM-01'">
+            <div class="card-header-flex">
+                <h3>Worker 1</h3>
+                <span id="h1_system" class="badge badge-inactive">-</span>
+            </div>
+            <p style="font-size: 16px; color: #94a3b8;">ID: <span id="h1_id" style="color: white; font-weight: bold;">HELM-01</span></p>
+            <p style="font-size: 16px; margin-top: 10px;">Drowsiness: <span id="h1_drowsy">-</span></p>
+            <p style="font-size: 16px;">Accident: <span id="h1_accident">-</span></p>
         </div>
 
-        <!-- EYE STATUS -->
-
-        <div class="card">
-
-            <h3>
-                Eye Status
-            </h3>
-
-            <p id="eye_status">
-                -
-            </p>
-
+        <div class="card clickable-card" onclick="location.href='detail.html?id=HELM-02'">
+            <div class="card-header-flex">
+                <h3>Worker 2 </h3>
+                <span id="h2_system" class="badge badge-active">ACTIVE</span>
+            </div>
+            <p style="font-size: 16px; color: #94a3b8;">ID: <span style="color: white; font-weight: bold;">HELM-02</span></p>
+            <p style="font-size: 16px; margin-top: 10px;">Drowsiness: <span class="safe">NORMAL</span></p>
+            <p style="font-size: 16px;">Accident: <span class="safe">SAFE</span></p>
         </div>
 
-        <!-- DROWSINESS -->
-
-        <div class="card">
-
-            <h3>
-                Drowsiness
-            </h3>
-
-            <p id="drowsiness_status">
-                -
-            </p>
-
+        <div class="card clickable-card" onclick="location.href='detail.html?id=HELM-03'">
+            <div class="card-header-flex">
+                <h3>Worker 3 </h3>
+                <span id="h3_system" class="badge badge-active">ACTIVE</span>
+            </div>
+            <p style="font-size: 16px; color: #94a3b8;">ID: <span style="color: white; font-weight: bold;">HELM-03</span></p>
+            <p style="font-size: 16px; margin-top: 10px;">Drowsiness: <span class="warning">DROWSY</span></p>
+            <p style="font-size: 16px;">Accident: <span class="safe">SAFE</span></p>
         </div>
-
-        <!-- ACCIDENT -->
-
-        <div class="card">
-
-            <h3>
-                Accident
-            </h3>
-
-            <p id="accident_status">
-                -
-            </p>
-
-        </div>
-
-        <!-- HELMET ACTIVITY -->
-
-        <div class="card">
-
-            <h3>
-                Helmet Activity
-            </h3>
-
-            <p id="helmet_activity_status">
-                -
-            </p>
-
-        </div>
-
-        <!-- SYSTEM CONTROL -->
-
-        <div class="card">
-
-            <h3>
-                System Control
-            </h3>
-
-            <label class="switch">
-
-                <input type="checkbox"
-                    id="system_toggle">
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-        <!-- GYROSCOPE -->
-
-        <div class="card gyro">
-
-            <h3>
-                Gyroscope Data
-            </h3>
-
-            <p>
-
-                X :
-                <span id="gyro_x">
-                    -
-                </span>
-
-            </p>
-
-            <p>
-
-                Y :
-                <span id="gyro_y">
-                    -
-                </span>
-
-            </p>
-
-            <p>
-
-                Z :
-                <span id="gyro_z">
-                    -
-                </span>
-
-            </p>
-
-        </div>
-
-        <!-- LAST UPDATE -->
-
-        <div class="card">
-
-            <h3>
-                Last Update
-            </h3>
-
-            <p id="updated_at">
-                -
-            </p>
-
-        </div>
-
     </div>
-
-    <!-- ========================= -->
-    <!-- MAP -->
-    <!-- ========================= -->
 
     <div class="map-card">
-
-        <h3>
-            Worker Location
-        </h3>
-
+        <h3>All Workers Live Location</h3>
         <div id="map"></div>
-
     </div>
-
-    <!-- ========================= -->
-    <!-- EVENT LOG -->
-    <!-- ========================= -->
-
-    <div class="event-card">
-
-        <h3>
-            Realtime Event Log
-        </h3>
-
-        <div id="event_log">
-
-        </div>
-
-    </div>
-
 </div>
 
-<!-- ========================= -->
-<!-- JAVASCRIPT -->
-<!-- ========================= -->
-
 <script src="app.js"></script>
-
 </body>
 </html>

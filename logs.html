@@ -1,254 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Logs</title>
-
+    <title>Event Logs - Multi Helmet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
     <link rel="stylesheet" href="style.css">
+    <style>
+        select {
+            background: #111827; color: white; border: 1px solid #3b82f6;
+            padding: 8px 15px; border-radius: 10px; font-size: 14px; cursor: pointer; outline: none;
+        }
+    </style>
 </head>
-
 <body>
 
 <nav class="navbar">
-    <div class="logo">
-        SMART HELMET
-    </div>
+    <div class="logo">SMART HELMET</div>
     <div class="nav-links">
-        <a href="index.html">Dashboard</a>
+        <a href="index.html">Fleet Dashboard</a>
         <a href="logs.html" class="active">Event Logs</a>
     </div>
 </nav>
 
 <div class="container">
-
     <header>
         <h1>EVENT LOGS</h1>
-        <p>Industrial Safety Event History</p>
+        <p>Industrial Safety Event History Audit</p>
     </header>
 
     <div class="log-table-card">
         <div class="tracking-header">
             <h2 class="section-title">Event History</h2>
-            <div id="tracking_info">Loading...</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label for="helmet_selector" style="color: #94a3b8; font-size: 14px;">Select Device:</label>
+                <select id="helmet_selector" onchange="switchDeviceLog()">
+                    <option value="HELM-01">HELM-01 (Live Database)</option>
+                    <option value="HELM-02">HELM-02 (Dummy Worker)</option>
+                    <option value="HELM-03">HELM-03 (Dummy Worker)</option>
+                </select>
+                <div id="tracking_info">Loading...</div>
+            </div>
         </div>
 
         <table>
             <thead>
                 <tr>
                     <th>Time</th>
-                    <th>Device</th>
-                    <th>Event</th>
-                    <th>Severity</th>
+                    <th>Device ID</th>
+                    <th>Event Log Message</th>
+                    <th>Severity Status</th>
                 </tr>
             </thead>
-            <tbody id="log_table">
-                </tbody>
+            <tbody id="log_table"></tbody>
         </table>
     </div>
 
     <div class="map-card">
-        <h3>Worker Tracking Route</h3>
+        <h3 id="map_title">Worker Tracking Route</h3>
         <div id="map"></div>
     </div>
-
 </div>
 
-<script>
-// =========================
-// SUPABASE CONFIG
-// =========================
-const SUPABASE_URL = "https://vfqbpjabzghzjuhmwxtj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_QKA_4y0d6eZZo561MQsUnA_kGmCpgkh";
-
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// =========================
-// FORMAT DATETIME
-// =========================
-function formatDateTime(timestamp){
-    const date = new Date(timestamp);
-    return date.toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-    });
-}
-
-// =========================
-// MAP INITIALIZATION
-// =========================
-const map = L.map('map').setView([-6.200000, 106.816000], 15);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'OpenStreetMap'
-}).addTo(map);
-
-// =========================
-// CUSTOM ICONS
-// =========================
-const startIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-const endIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-// =========================
-// GLOBAL MAP LAYERS
-// =========================
-let routeLine = null;
-let startMarker = null;
-let endMarker = null;
-
-// =========================
-// LOAD LOGS & UPDATE MAP
-// =========================
-async function loadLogs(){
-    try {
-        // Tetap ambil 20 data teratas untuk kebutuhan history tabel
-        const { data, error } = await client
-            .from("sensor_realtime")
-            .select("*")
-            .order("updated_at", { ascending: false })
-            .limit(20);
-
-        if(error) {
-            console.log("Supabase Error:", error);
-            return;
-        }
-
-        if(!data || data.length === 0) {
-            console.log("No data found");
-            return;
-        }
-
-        // ==========================================
-        // 1. RENDER DATA KE TABEL (20 Data Terbaru)
-        // ==========================================
-        const table = document.getElementById("log_table");
-        table.innerHTML = "";
-
-        data.forEach(sensor => {
-            let event = "🟢 NORMAL";
-            let severity = "safe";
-
-            if(sensor.drowsiness_status){
-                event = "⚠️ MENGANTUK";
-                severity = "warning";
-            }
-            if(sensor.accident_status){
-                event = "🚨 JATUH";
-                severity = "danger";
-            }
-            if(sensor.helmet_activity_status === "inactive"){
-                event = "🪖 HELM TIDAK AKTIF";
-                severity = "danger";
-            }
-            if(!sensor.system_status){
-                event = "⛔ SYSTEM OFF";
-                severity = "warning";
-            }
-
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${formatDateTime(sensor.updated_at)}</td>
-                <td>${sensor.device_id}</td>
-                <td>${event}</td>
-                <td><span class="${severity}">${severity.toUpperCase()}</span></td>
-            `;
-            table.appendChild(row);
-        });
-
-        // ==========================================
-        // 2. PROSES PETA (Hanya Menggunakan 10 Data Terbaru)
-        // ==========================================
-        // Ambil maksimal 10 data teratas dari hasil query, lalu balik urutannya (oldest -> newest)
-        const totalDataForMap = data.slice(0, 10);
-        const trackingData = [...totalDataForMap].reverse();
-
-        // Bersihkan layer map yang lama jika ada
-        if(routeLine) map.removeLayer(routeLine);
-        if(startMarker) map.removeLayer(startMarker);
-        if(endMarker) map.removeLayer(endMarker);
-
-        // Ekstrak koordinat untuk jalur
-        const routeCoords = trackingData.map(item => [
-            parseFloat(item.latitude),
-            parseFloat(item.longitude)
-        ]);
-
-        // Gambar ulang jalur (Polyline)
-        routeLine = L.polyline(routeCoords, {
-            color: "#3b82f6",
-            weight: 5,
-            opacity: 0.8
-        }).addTo(map);
-
-        // START POINT (Data paling lama dari 10 data terakhir)
-        const startData = trackingData[0];
-        startMarker = L.marker(
-            [parseFloat(startData.latitude), parseFloat(startData.longitude)],
-            { icon: startIcon }
-        )
-        .addTo(map)
-        .bindPopup(`
-            <b>START POINT (10 Data Terakhir)</b><br><br>
-            Time: <br>${formatDateTime(startData.updated_at)}
-        `);
-
-        // LAST POSITION (Data paling baru)
-        const endData = trackingData[trackingData.length - 1];
-        endMarker = L.marker(
-            [parseFloat(endData.latitude), parseFloat(endData.longitude)],
-            { icon: endIcon }
-        )
-        .addTo(map)
-        .bindPopup(`
-            <b>LAST POSITION</b><br><br>
-            Device: <br>${endData.device_id}<br><br>
-            Time: <br>${formatDateTime(endData.updated_at)}
-        `);
-
-        // Fit kamera map agar pas dengan batas jalur 10 data tersebut
-        map.fitBounds(routeLine.getBounds());
-
-        // Update teks info tracking
-        document.getElementById("tracking_info").innerHTML = `
-            Tracking Points: <b>${routeCoords.length}</b>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            Latest Update: <b>${formatDateTime(data[0].updated_at)}</b>
-        `;
-
-    } catch(err) {
-        console.log("Fetch Error:", err);
-    }
-}
-
-// =========================
-// RUN & TIMER LOGS
-// =========================
-loadLogs();
-
-// Refresh otomatis setiap 10 detik
-setInterval(loadLogs, 10000);
-</script>
-
+<script src="logs.js"></script>
 </body>
 </html>
