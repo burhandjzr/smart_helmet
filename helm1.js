@@ -19,6 +19,10 @@ let lastAccident = false;
 let lastInactive = false;
 let lastSystem = true;
 
+// Inisialisasi Audio Kustom dari folder assets/
+const alarmAudio = new Audio('assets/sirine-alarm.mp3');
+alarmAudio.loop = true; // Alarm berulang terus selama accident_status = true
+
 function formatDateTime(timestamp){
     const date = new Date(timestamp);
     return date.toLocaleString("id-ID", {
@@ -46,7 +50,97 @@ function setStatus(elementId, text, className){
     if(el) el.innerHTML = `<span class="${className}">${text}</span>`;
 }
 
-async function fetchDataHelm1(){
+// Fungsi Notifikasi Browser Sistem
+function triggerBrowserNotification(deviceId) {
+    if (!("Notification" in window)) {
+        console.log("Browser ini tidak mendukung sistem notifikasi deskop/HP.");
+        return;
+    }
+
+    if (Notification.permission === "granted") {
+        new Notification("🚨 EMERGENCY: ACCIDENT DETECTED!", {
+            body: `Pekerja dengan perangkat ${deviceId} terdeteksi mengalami kecelakaan! Segera cek lokasi aktif pekerja.`,
+            icon: 'https://cdn-icons-png.flaticon.com/512/595/595067.png',
+            requireInteraction: true 
+        });
+    } 
+    else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                triggerBrowserNotification(deviceId);
+            }
+        });
+    }
+}
+
+// FUNGSI UPDATE UI (Dipanggil otomatis secara instan oleh WebSocket Realtime)
+function updateUIHelmet1(sensor) {
+    if (!sensor) return;
+
+    // EVENT DETECTION LOGIC
+    if(sensor.drowsiness_status && !lastDrowsy) addEventLog("⚠️ DROWSINESS DETECTED", "warning");
+    if(!sensor.drowsiness_status && lastDrowsy) addEventLog("🟢 WORKER NORMAL", "safe");
+    lastDrowsy = sensor.drowsiness_status;
+
+    // LOGIKA EMERGENCY: ACCIDENT STATUS
+    if (sensor.accident_status && !lastAccident) {
+        addEventLog("🚨 MENGANTUK", "danger");
+
+        // 1. Putar Musik Alarm (.mp3 lokal)
+        alarmAudio.play().catch(err => console.log("Audio diblokir browser sebelum ada interaksi klik:", err));
+
+        // 2. Efek Getar HP
+        if (navigator.vibrate) {
+            navigator.vibrate([500, 250, 500, 250, 500]);
+        }
+
+        // 3. Munculkan Notifikasi Sistem
+        triggerBrowserNotification(sensor.device_id);
+
+    } else if (!sensor.accident_status && lastAccident) {
+        // Matikan jika kondisi kembali normal
+        alarmAudio.pause();
+        alarmAudio.currentTime = 0; 
+        if (navigator.vibrate) {
+            navigator.vibrate(0); 
+        }
+    }
+    lastAccident = sensor.accident_status;
+
+    if(sensor.helmet_activity_status === "inactive" && !lastInactive) addEventLog("🪖 HELMET INACTIVE", "danger");
+    lastInactive = sensor.helmet_activity_status === "inactive";
+
+    if(!sensor.system_status && lastSystem) addEventLog("⛔ SYSTEM OFF", "warning");
+    if(sensor.system_status && !lastSystem) addEventLog("✅ SYSTEM ON", "safe");
+    lastSystem = sensor.system_status;
+
+    // UPDATE TEXT UI
+    document.getElementById("device_id").innerText = sensor.device_id;
+    document.getElementById("gyro_x").innerText = sensor.gyro_x;
+    document.getElementById("gyro_y").innerText = sensor.gyro_y;
+    document.getElementById("gyro_z").innerText = sensor.gyro_z;
+    document.getElementById("updated_at").innerText = formatDateTime(sensor.updated_at);
+
+    setStatus("eye_status", sensor.eye_status === "open" ? "OPEN" : "CLOSED", sensor.eye_status === "open" ? "safe" : "warning");
+    setStatus("drowsiness_status", sensor.drowsiness_status ? "DROWSY" : "NORMAL", sensor.drowsiness_status ? "warning" : "safe");
+    setStatus("accident_status", sensor.accident_status ? "ACCIDENT" : "SAFE", sensor.accident_status ? "danger" : "safe");
+    setStatus("helmet_activity_status", sensor.helmet_activity_status === "inactive" ? "INACTIVE" : "ACTIVE", sensor.helmet_activity_status === "inactive" ? "danger" : "safe");
+
+    const toggle = document.getElementById("system_toggle");
+    if(toggle) toggle.checked = sensor.system_status;
+
+    // MAP UPDATE
+    const lat = parseFloat(sensor.latitude);
+    const lng = parseFloat(sensor.longitude);
+    if(!isNaN(lat) && !isNaN(lng)){
+        marker.setLatLng([lat, lng]);
+        map.setView([lat, lng], 17);
+        marker.bindPopup(`<b>HELM-01 (Live)</b><br>Last Update:<br>${formatDateTime(sensor.updated_at)}`);
+    }
+}
+
+// LOAD DATA PERTAMA KALI SAAT HALAMAN DIBUKA
+async function fetchInitialData(){
     try {
         const { data, error } = await client
             .from("sensor_realtime")
@@ -55,48 +149,30 @@ async function fetchDataHelm1(){
             .limit(1);
 
         if(error || !data || data.length === 0) return;
-        const sensor = data[0];
-
-        // EVENT DETECTION LOGIC
-        if(sensor.drowsiness_status && !lastDrowsy) addEventLog("⚠️ DROWSINESS DETECTED", "warning");
-        if(!sensor.drowsiness_status && lastDrowsy) addEventLog("🟢 WORKER NORMAL", "safe");
-        lastDrowsy = sensor.drowsiness_status;
-
-        if(sensor.accident_status && !lastAccident) addEventLog("🚨 MENGANTUK", "danger");
-        lastAccident = sensor.accident_status;
-
-        if(sensor.helmet_activity_status === "inactive" && !lastInactive) addEventLog("🪖 HELMET INACTIVE", "danger");
-        lastInactive = sensor.helmet_activity_status === "inactive";
-
-        if(!sensor.system_status && lastSystem) addEventLog("⛔ SYSTEM OFF", "warning");
-        if(sensor.system_status && !lastSystem) addEventLog("✅ SYSTEM ON", "safe");
-        lastSystem = sensor.system_status;
-
-        // UPDATE TEXT UI
-        document.getElementById("device_id").innerText = sensor.device_id;
-        document.getElementById("gyro_x").innerText = sensor.gyro_x;
-        document.getElementById("gyro_y").innerText = sensor.gyro_y;
-        document.getElementById("gyro_z").innerText = sensor.gyro_z;
-        document.getElementById("updated_at").innerText = formatDateTime(sensor.updated_at);
-
-        setStatus("eye_status", sensor.eye_status === "open" ? "OPEN" : "CLOSED", sensor.eye_status === "open" ? "safe" : "warning");
-        setStatus("drowsiness_status", sensor.drowsiness_status ? "DROWSY" : "NORMAL", sensor.drowsiness_status ? "warning" : "safe");
-        setStatus("accident_status", sensor.accident_status ? "ACCIDENT" : "SAFE", sensor.accident_status ? "danger" : "safe");
-        setStatus("helmet_activity_status", sensor.helmet_activity_status === "inactive" ? "INACTIVE" : "ACTIVE", sensor.helmet_activity_status === "inactive" ? "danger" : "safe");
-
-        const toggle = document.getElementById("system_toggle");
-        if(toggle) toggle.checked = sensor.system_status;
-
-        // MAP UPDATE
-        const lat = parseFloat(sensor.latitude);
-        const lng = parseFloat(sensor.longitude);
-        if(!isNaN(lat) && !isNaN(lng)){
-            marker.setLatLng([lat, lng]);
-            map.setView([lat, lng], 17);
-            marker.bindPopup(`<b>HELM-01 (Live)</b><br>Last Update:<br>${formatDateTime(sensor.updated_at)}`);
-        }
+        updateUIHelmet1(data[0]);
     } catch(err) { console.log(err); }
 }
+
+// ==========================================
+// KONEKSI REALTIME LIVE (WEBSOCKET)
+// ==========================================
+client
+    .channel('schema-db-changes')
+    .on(
+        'postgres_changes',
+        {
+            event: '*', 
+            schema: 'public',
+            table: 'sensor_realtime'
+        },
+        (payload) => {
+            // Ketika ada update data di database, fungsi ini langsung meremajakan UI tanpa refresh halaman
+            if (payload.new && payload.new.device_id === "HELM-01") {
+                updateUIHelmet1(payload.new);
+            }
+        }
+    )
+    .subscribe();
 
 // TOGGLE SWITCH CONTROL
 document.getElementById("system_toggle").addEventListener("change", async function(){
@@ -109,5 +185,10 @@ document.getElementById("system_toggle").addEventListener("change", async functi
     } catch(err) { console.log(err); }
 });
 
-fetchDataHelm1();
-setInterval(fetchDataHelm1, 3000);
+// Meminta izin notifikasi browser secara otomatis
+if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+}
+
+// Jalankan pengambilan data awal
+fetchInitialData();
