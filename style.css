@@ -55,6 +55,31 @@ header p{ color:#94a3b8; }
 .warning{ color:#f59e0b; }
 .danger{ color:#ef4444; }
 
+/* CLICKABLE CARD */
+.clickable-card {
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+.clickable-card:hover {
+    transform: translateY(-5px);
+    background: #24324d;
+    border: 1px solid #3b82f6;
+}
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.badge-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.badge-inactive { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
 /* MAP CONTAINERS */
 .map-card{ margin-top:30px; background:#1e293b; padding:20px; border-radius:20px; }
 #map{ height:450px; border-radius:20px; margin-top:20px; z-index:1; }

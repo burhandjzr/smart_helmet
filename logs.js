@@ -1,9 +1,4 @@
-const SUPABASE_URL = "https://vfqbpjabzghzjuhmwxtj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_QKA_4y0d6eZZo561MQsUnA_kGmCpgkh";
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const BASE_LAT = -6.367170;
-const BASE_LNG = 106.831740;
+// logs.js — relies on client, BASE_LAT, BASE_LNG, formatDateTime from app.js
 
 const map = L.map('map').setView([BASE_LAT, BASE_LNG], 16);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMap' }).addTo(map);
@@ -20,36 +15,30 @@ const endIcon = L.icon({
     iconSize: [25, 41], iconAnchor: [12, 41]
 });
 
-let routeLine = null; let startMarker = null; let endMarker = null;
+let routeLine = null;
+let startMarker = null;
+let endMarker = null;
 
-function formatDateTime(timestamp){
-    const date = new Date(timestamp);
-    return date.toLocaleString("id-ID", {
-        day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"
-    });
-}
-
-async function fetchAuditLogs(){
+async function fetchAuditLogs() {
     const selector = document.getElementById("helmet_selector");
     const selectedHelmet = selector ? selector.value : "HELM-01";
     document.getElementById("map_title").innerText = `Worker Tracking Route - ${selectedHelmet}`;
 
     let dataRows = [];
 
-    if(selectedHelmet === "HELM-01") {
+    if (selectedHelmet === "HELM-01") {
         try {
             const { data, error } = await client
                 .from("sensor_realtime")
                 .select("*")
                 .order("updated_at", { ascending: false })
                 .limit(10);
-
-            if(!error && data) dataRows = data;
-        } catch(e) { console.log(e); }
+            if (!error && data) dataRows = data;
+        } catch (e) { console.log(e); }
     } else {
         const isH3 = selectedHelmet === "HELM-03";
-        for(let i = 0; i < 10; i++) {
-            let offsetSpace = i * 0.00008;
+        for (let i = 0; i < 10; i++) {
+            const offsetSpace = i * 0.00008;
             dataRows.push({
                 updated_at: new Date(Date.now() - i * 60000).toISOString(),
                 device_id: selectedHelmet,
@@ -63,15 +52,15 @@ async function fetchAuditLogs(){
         }
     }
 
-    if(dataRows.length === 0) return;
+    if (dataRows.length === 0) return;
 
     const tbody = document.getElementById("log_table");
     tbody.innerHTML = "";
     dataRows.forEach(sensor => {
-        let msg = "🟢 WORKER NORMAL"; let severity = "safe";
-        if(sensor.drowsiness_status) { msg = "⚠️ DROWSINESS DETECTED"; severity = "warning"; }
-        if(sensor.accident_status) { msg = "🚨 ACCIDENT DETECTED"; severity = "danger"; }
-        
+        let msg = "🟢 WORKER NORMAL", severity = "safe";
+        if (sensor.drowsiness_status) { msg = "⚠️ DROWSINESS DETECTED"; severity = "warning"; }
+        if (sensor.accident_status)   { msg = "🚨 ACCIDENT DETECTED";   severity = "danger";  }
+
         const row = document.createElement("tr");
         row.innerHTML = `<td>${formatDateTime(sensor.updated_at)}</td><td>${sensor.device_id}</td><td>${msg}</td><td><span class="${severity}">${severity.toUpperCase()}</span></td>`;
         tbody.appendChild(row);
@@ -79,9 +68,9 @@ async function fetchAuditLogs(){
 
     const trackingData = [...dataRows].reverse();
 
-    if(routeLine) map.removeLayer(routeLine);
-    if(startMarker) map.removeLayer(startMarker);
-    if(endMarker) map.removeLayer(endMarker);
+    if (routeLine)    map.removeLayer(routeLine);
+    if (startMarker)  map.removeLayer(startMarker);
+    if (endMarker)    map.removeLayer(endMarker);
 
     const routeCoords = trackingData.map(item => [parseFloat(item.latitude), parseFloat(item.longitude)]);
     routeLine = L.polyline(routeCoords, { color: "#3b82f6", weight: 5, opacity: 0.85 }).addTo(map);

@@ -8,31 +8,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .clickable-card {
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .clickable-card:hover {
-            transform: translateY(-5px);
-            background: #24324d;
-            border: 1px solid #3b82f6;
-        }
-        .card-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .badge-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .badge-inactive { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-    </style>
 </head>
 <body>
 
@@ -55,29 +30,29 @@
                 <h3>Worker 1</h3>
                 <span id="h1_system" class="badge badge-inactive">-</span>
             </div>
-            <p style="font-size: 16px; color: #94a3b8;">ID: <span id="h1_id" style="color: white; font-weight: bold;">HELM-01</span></p>
-            <p style="font-size: 16px; margin-top: 10px;">Drowsiness: <span id="h1_drowsy">-</span></p>
-            <p style="font-size: 16px;">Accident: <span id="h1_accident">-</span></p>
+            <p style="font-size:16px;color:#94a3b8;">ID: <span id="h1_id" style="color:white;font-weight:bold;">HELM-01</span></p>
+            <p style="font-size:16px;margin-top:10px;">Drowsiness: <span id="h1_drowsy">-</span></p>
+            <p style="font-size:16px;">Accident: <span id="h1_accident">-</span></p>
         </div>
 
         <div class="card clickable-card" onclick="location.href='detail.html?id=HELM-02'">
             <div class="card-header-flex">
-                <h3>Worker 2 </h3>
-                <span id="h2_system" class="badge badge-active">ACTIVE</span>
+                <h3>Worker 2</h3>
+                <span class="badge badge-active">ACTIVE</span>
             </div>
-            <p style="font-size: 16px; color: #94a3b8;">ID: <span style="color: white; font-weight: bold;">HELM-02</span></p>
-            <p style="font-size: 16px; margin-top: 10px;">Drowsiness: <span class="safe">NORMAL</span></p>
-            <p style="font-size: 16px;">Accident: <span class="safe">SAFE</span></p>
+            <p style="font-size:16px;color:#94a3b8;">ID: <span style="color:white;font-weight:bold;">HELM-02</span></p>
+            <p style="font-size:16px;margin-top:10px;">Drowsiness: <span class="safe">NORMAL</span></p>
+            <p style="font-size:16px;">Accident: <span class="safe">SAFE</span></p>
         </div>
 
         <div class="card clickable-card" onclick="location.href='detail.html?id=HELM-03'">
             <div class="card-header-flex">
-                <h3>Worker 3 </h3>
-                <span id="h3_system" class="badge badge-active">ACTIVE</span>
+                <h3>Worker 3</h3>
+                <span class="badge badge-active">ACTIVE</span>
             </div>
-            <p style="font-size: 16px; color: #94a3b8;">ID: <span style="color: white; font-weight: bold;">HELM-03</span></p>
-            <p style="font-size: 16px; margin-top: 10px;">Drowsiness: <span class="warning">DROWSY</span></p>
-            <p style="font-size: 16px;">Accident: <span class="safe">SAFE</span></p>
+            <p style="font-size:16px;color:#94a3b8;">ID: <span style="color:white;font-weight:bold;">HELM-03</span></p>
+            <p style="font-size:16px;margin-top:10px;">Drowsiness: <span class="warning">DROWSY</span></p>
+            <p style="font-size:16px;">Accident: <span class="safe">SAFE</span></p>
         </div>
     </div>
 

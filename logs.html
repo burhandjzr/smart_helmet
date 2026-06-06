@@ -34,8 +34,8 @@
     <div class="log-table-card">
         <div class="tracking-header">
             <h2 class="section-title">Event History</h2>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <label for="helmet_selector" style="color: #94a3b8; font-size: 14px;">Select Device:</label>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <label for="helmet_selector" style="color:#94a3b8;font-size:14px;">Select Device:</label>
                 <select id="helmet_selector" onchange="switchDeviceLog()">
                     <option value="HELM-01">HELM-01 (Live Database)</option>
                     <option value="HELM-02">HELM-02 (Dummy Worker)</option>
@@ -64,6 +64,8 @@
     </div>
 </div>
 
+<!-- app.js provides client, BASE_LAT/LNG, formatDateTime -->
+<script src="app.js"></script>
 <script src="logs.js"></script>
 </body>
 </html>

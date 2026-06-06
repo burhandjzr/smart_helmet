@@ -26,26 +26,11 @@
     </header>
 
     <div class="grid">
-        <div class="card">
-            <h3>Device ID</h3>
-            <p id="device_id">-</p>
-        </div>
-        <div class="card">
-            <h3>Eye Status</h3>
-            <p id="eye_status">-</p>
-        </div>
-        <div class="card">
-            <h3>Drowsiness</h3>
-            <p id="drowsiness_status">-</p>
-        </div>
-        <div class="card">
-            <h3>Accident</h3>
-            <p id="accident_status">-</p>
-        </div>
-        <div class="card">
-            <h3>Helmet Activity</h3>
-            <p id="helmet_activity_status">-</p>
-        </div>
+        <div class="card"><h3>Device ID</h3><p id="device_id">-</p></div>
+        <div class="card"><h3>Eye Status</h3><p id="eye_status">-</p></div>
+        <div class="card"><h3>Drowsiness</h3><p id="drowsiness_status">-</p></div>
+        <div class="card"><h3>Accident</h3><p id="accident_status">-</p></div>
+        <div class="card"><h3>Helmet Activity</h3><p id="helmet_activity_status">-</p></div>
         <div class="card">
             <h3>System Control</h3>
             <label class="switch">
@@ -59,10 +44,7 @@
             <p>Y : <span id="gyro_y">-</span></p>
             <p>Z : <span id="gyro_z">-</span></p>
         </div>
-        <div class="card">
-            <h3>Last Update</h3>
-            <p id="updated_at">-</p>
-        </div>
+        <div class="card"><h3>Last Update</h3><p id="updated_at">-</p></div>
     </div>
 
     <div class="map-card">
@@ -70,23 +52,15 @@
         <div id="map"></div>
     </div>
 
-    <div class="log-table-card" style="margin-top: 30px;">
+    <div class="log-table-card" style="margin-top:30px;">
         <h2 class="section-title">Realtime Event Log</h2>
         <div id="event_log"></div>
     </div>
 </div>
 
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id') || "HELM-01";
-    
-    let scriptSrc = "helm1.js"; // Default
-    if (id === "HELM-02") scriptSrc = "helm2.js";
-    if (id === "HELM-03") scriptSrc = "helm3.js";
-    
-    const scriptTag = document.createElement("script");
-    scriptTag.src = scriptSrc;
-    document.body.appendChild(scriptTag);
-</script>
+<!-- app.js loaded first: provides client, BASE_LAT/LNG, formatDateTime, setStatusUI -->
+<script src="app.js"></script>
+<!-- helm.js reads ?id= from URL and runs the correct live/dummy logic -->
+<script src="helm.js"></script>
 </body>
 </html>
