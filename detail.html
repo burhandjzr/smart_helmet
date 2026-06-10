@@ -14,10 +14,22 @@
 <nav class="navbar">
     <div class="logo">SMART HELMET</div>
     <div class="nav-links">
-        <a href="index.html">Fleet Dashboard</a>
+        <a href="index.html">Main Dashboard</a>
         <a href="logs.html">Event Logs</a>
+        <span class="nav-user">👤 admin</span>
+        <a href="#" class="btn-logout" onclick="doLogout()">⏻ Logout</a>
     </div>
 </nav>
+<script>
+    if (sessionStorage.getItem("sh_auth") !== "true") {
+        window.location.replace("login.html");
+    }
+    function doLogout() {
+        sessionStorage.removeItem("sh_auth");
+        sessionStorage.removeItem("sh_user");
+        window.location.replace("login.html");
+    }
+</script>
 
 <div class="container">
     <header>
@@ -28,8 +40,8 @@
     <div class="grid">
         <div class="card"><h3>Device ID</h3><p id="device_id">-</p></div>
         <div class="card"><h3>Eye Status</h3><p id="eye_status">-</p></div>
-        <div class="card"><h3>Drowsiness</h3><p id="drowsiness_status">-</p></div>
-        <div class="card"><h3>Accident</h3><p id="accident_status">-</p></div>
+        <div class="card"><h3>Kantuk</h3><p id="drowsiness_status">-</p></div>
+        <div class="card"><h3>Insiden</h3><p id="accident_status">-</p></div>
         <div class="card"><h3>Helmet Activity</h3><p id="helmet_activity_status">-</p></div>
         <div class="card">
             <h3>System Control</h3>

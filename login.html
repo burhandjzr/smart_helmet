@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Helmet System — Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap');
+
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        :root {
+            --blue:    #3b82f6;
+            --blue-dim: #1d4ed8;
+            --cyan:    #06b6d4;
+            --red:     #ef4444;
+            --green:   #22c55e;
+            --bg:      #060d1a;
+            --surface: #0d1f3c;
+            --card:    #0f2748;
+            --border:  rgba(59,130,246,0.25);
+            --text:    #e2e8f0;
+            --muted:   #64748b;
+            --mono:    'Share Tech Mono', monospace;
+            --sans:    'Exo 2', sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            overflow: hidden;
+        }
+
+        /* ─── ANIMATED GRID BG ─── */
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0;
+            background-image:
+                linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px);
+            background-size: 48px 48px;
+            animation: gridShift 20s linear infinite;
+        }
+        @keyframes gridShift {
+            from { background-position: 0 0; }
+            to   { background-position: 48px 48px; }
+        }
+
+        /* ─── GLOW BLOBS ─── */
+        .blob {
+            position: fixed; border-radius: 50%;
+            filter: blur(100px); pointer-events: none; z-index: 0;
+        }
+        .blob-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+            top: -150px; left: -100px;
+            animation: floatBlob 10s ease-in-out infinite alternate;
+        }
+        .blob-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);
+            bottom: -100px; right: -100px;
+            animation: floatBlob 13s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatBlob {
+            from { transform: translate(0, 0); }
+            to   { transform: translate(40px, 30px); }
+        }
+
+        /* ─── SCAN LINE OVERLAY ─── */
+        .scan-overlay {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 3px,
+                rgba(0,0,0,0.06) 3px,
+                rgba(0,0,0,0.06) 4px
+            );
+        }
+
+        /* ─── MAIN LAYOUT ─── */
+        .page {
+            position: relative; z-index: 2;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 100%; max-width: 960px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(59,130,246,0.1),
+                0 30px 80px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        /* ─── LEFT PANEL ─── */
+        .left-panel {
+            flex: 1;
+            background:
+                linear-gradient(135deg, rgba(14,42,85,0.95), rgba(6,13,26,0.98));
+            padding: 50px 40px;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--cyan), var(--blue));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .brand {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .brand-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+        .brand-name {
+            font-size: 30px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        .brand-name span { color: var(--blue); }
+
+        /* Helmet SVG illustration */
+        .helmet-art {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px 0;
+        }
+        .helmet-svg-wrap {
+            position: relative;
+        }
+        .helmet-svg-wrap svg {
+            width: 180px; height: auto;
+            filter: drop-shadow(0 0 30px rgba(59,130,246,0.4));
+            animation: helmetFloat 4s ease-in-out infinite;
+        }
+        @keyframes helmetFloat {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-10px); }
+        }
+
+        /* Orbit ring */
+        .orbit-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 260px; height: 260px;
+            border: 1px dashed rgba(59,130,246,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: spinRing 18s linear infinite;
+        }
+        .orbit-dot {
+            position: absolute;
+            width: 7px; height: 7px;
+            background: var(--cyan);
+            border-radius: 50%;
+            top: -3.5px; left: 50%;
+            margin-left: -3.5px;
+            box-shadow: 0 0 8px var(--cyan);
+        }
+        @keyframes spinRing {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Status indicators bottom-left */
+        .sys-status {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .sys-row {
+            display: flex; align-items: center; gap: 10px;
+            font-family: var(--mono); font-size: 12px; color: var(--muted);
+        }
+        .sys-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .sys-dot.blue { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+        .sys-dot.cyan { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.3; }
+        }
+
+        /* ─── RIGHT PANEL (LOGIN FORM) ─── */
+        .right-panel {
+            width: 420px;
+            padding: 50px 44px;
+            display: flex; flex-direction: column; justify-content: center;
+            background: var(--surface);
+        }
+
+        .form-eyebrow {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--blue);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .form-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .form-sub {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 36px;
+        }
+
+        /* ─── FORM FIELDS ─── */
+        .field {
+            margin-bottom: 20px;
+        }
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap .icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--muted); font-size: 16px; pointer-events: none;
+        }
+        .input-wrap input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            background: rgba(6,13,26,0.6);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 12px;
+            color: white;
+            font-family: var(--mono);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .input-wrap input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+        .input-wrap input::placeholder { color: var(--muted); }
+
+        /* ─── ERROR ALERT ─── */
+        #error_msg {
+            display: none;
+            padding: 12px 16px;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.4);
+            border-radius: 10px;
+            color: var(--red);
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-family: var(--mono);
+        }
+        #error_msg.show { display: flex; align-items: center; gap: 8px; }
+
+        /* ─── LOGIN BUTTON ─── */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--blue-dim), var(--blue));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s, box-shadow 0.25s;
+            box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(59,130,246,0.45);
+        }
+        .btn-login:active { transform: translateY(0); }
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+        .btn-login:hover::after { transform: translateX(100%); }
+
+        /* ─── FOOTER ─── */
+        .form-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+        }
+        .form-footer span { color: var(--blue); }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 700px) {
+            .login-wrapper { flex-direction: column; border-radius: 16px; }
+            .left-panel { display: none; }
+            .right-panel { width: 100%; padding: 40px 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="scan-overlay"></div>
+
+<div class="page">
+    <div class="login-wrapper">
+
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="brand">
+                <span class="brand-label">Industrial IoT</span>
+                <div class="brand-name">SMART<br><span>HELMET</span></div>
+            </div>
+
+            <div class="helmet-art">
+                <div class="helmet-svg-wrap">
+                    <div class="orbit-ring"><div class="orbit-dot"></div></div>
+                    <!-- Hard hat SVG -->
+                    <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Helmet shell -->
+                        <path d="M20 110 Q20 55 100 45 Q180 55 180 110 Z"
+                              fill="url(#helmGrad)" stroke="#3b82f6" stroke-width="2"/>
+                        <!-- Brim -->
+                        <rect x="8" y="108" width="184" height="14" rx="7"
+                              fill="#1d4ed8" stroke="#3b82f6" stroke-width="1.5"/>
+                        <!-- Visor band -->
+                        <path d="M40 90 Q100 80 160 90" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+                        <!-- LED indicator -->
+                        <circle cx="100" cy="70" r="6" fill="#22c55e">
+                            <animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <!-- Sensor dots -->
+                        <circle cx="68" cy="78" r="3" fill="#3b82f6" opacity="0.8"/>
+                        <circle cx="132" cy="78" r="3" fill="#3b82f6" opacity="0.8"/>
+                        <!-- Strap lines -->
+                        <line x1="60" y1="122" x2="55" y2="148" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+                        <line x1="140" y1="122" x2="145" y2="148" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+                        <!-- Buckle -->
+                        <rect x="88" y="148" width="24" height="10" rx="3" fill="#1d4ed8" stroke="#3b82f6" stroke-width="1"/>
+                        <defs>
+                            <linearGradient id="helmGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#1e40af"/>
+                                <stop offset="100%" stop-color="#1d3461"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="sys-status">
+                <div class="sys-row"><div class="sys-dot"></div>IoT Network Online</div>
+                <div class="sys-row"><div class="sys-dot blue"></div>Database Connected</div>
+                <div class="sys-row"><div class="sys-dot cyan"></div>Realtime Stream Active</div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <h1 class="form-title">Admin Login</h1>
+            <p class="form-sub">Authenticate to access the monitoring system.</p>
+
+            <div id="error_msg">
+                <span>⛔</span> Invalid credentials. Access denied.
+            </div>
+
+            <div class="field">
+                <label>Username</label>
+                <div class="input-wrap">
+                    <span class="icon">👤</span>
+                    <input type="text" id="inp_user" placeholder="Enter username" autocomplete="username"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <span class="icon">🔒</span>
+                    <input type="password" id="inp_pass" placeholder="Enter password" autocomplete="current-password"/>
+                </div>
+            </div>
+
+            <button class="btn-login" onclick="doLogin()">ACCESS SYSTEM</button>
+
+            <div class="form-footer">
+                SMART HELMET &nbsp;·&nbsp; <span>Authorized Personnel Only</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Jika sudah login, redirect langsung ke dashboard
+    if (sessionStorage.getItem("sh_auth") === "true") {
+        window.location.replace("index.html");
+    }
+
+    // Enter key support
+    document.getElementById("inp_pass").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") doLogin();
+    });
+    document.getElementById("inp_user").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") doLogin();
+    });
+
+    function doLogin() {
+        const user = document.getElementById("inp_user").value.trim();
+        const pass = document.getElementById("inp_pass").value;
+        const err  = document.getElementById("error_msg");
+
+        if (user === "admin" && pass === "admin123") {
+            sessionStorage.setItem("sh_auth", "true");
+            sessionStorage.setItem("sh_user", "admin");
+            window.location.replace("index.html");
+        } else {
+            err.classList.add("show");
+            document.getElementById("inp_pass").value = "";
+            // Shake animation on form
+            const card = document.querySelector(".right-panel");
+            card.style.animation = "none";
+            card.offsetHeight; // reflow
+            card.style.animation = "shake 0.4s ease";
+        }
+    }
+</script>
+<style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%       { transform: translateX(-8px); }
+        40%       { transform: translateX(8px); }
+        60%       { transform: translateX(-5px); }
+        80%       { transform: translateX(5px); }
+    }
+</style>
+</body>
+</html>

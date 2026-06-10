@@ -57,9 +57,9 @@ async function fetchAuditLogs() {
     const tbody = document.getElementById("log_table");
     tbody.innerHTML = "";
     dataRows.forEach(sensor => {
-        let msg = "🟢 WORKER NORMAL", severity = "safe";
-        if (sensor.drowsiness_status) { msg = "⚠️ DROWSINESS DETECTED"; severity = "warning"; }
-        if (sensor.accident_status)   { msg = "🚨 ACCIDENT DETECTED";   severity = "danger";  }
+        let msg = "🟢 Pekerja Normal", severity = "safe";
+        if (sensor.drowsiness_status) { msg = "⚠️ Kantuk Terdeteksi"; severity = "warning"; }
+        if (sensor.accident_status)   { msg = "🚨 Insiden Terdeteksi"; severity = "danger";  }
 
         const row = document.createElement("tr");
         row.innerHTML = `<td>${formatDateTime(sensor.updated_at)}</td><td>${sensor.device_id}</td><td>${msg}</td><td><span class="${severity}">${severity.toUpperCase()}</span></td>`;

@@ -135,12 +135,12 @@ function updateUI(sensor) {
     const isAccident = sensor.accident_status === true || sensor.accident_status === 1 || sensor.accident_status === "true";
 
     // Event detection
-    if (isDrowsy && !lastDrowsy) addEventLog("⚠️ DROWSINESS DETECTED", "warning");
-    if (!isDrowsy && lastDrowsy) addEventLog("🟢 WORKER NORMAL", "safe");
+    if (isDrowsy && !lastDrowsy) addEventLog("⚠️ Kantuk Terdeteksi", "warning");
+    if (!isDrowsy && lastDrowsy) addEventLog("🟢 Pekerja Normal", "safe");
     lastDrowsy = isDrowsy;
 
     if (isAccident && !lastAccident) {
-        addEventLog("🚨 ACCIDENT DETECTED", "danger");
+        addEventLog("🚨 Insiden Terdeteksi", "danger");
         alarmAudio.play().catch(err => console.log("Audio diblokir browser:", err));
         if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 500]);
         triggerBrowserNotification(sensor.device_id);
@@ -166,8 +166,8 @@ function updateUI(sensor) {
     document.getElementById("updated_at").innerText = formatDateTime(sensor.updated_at);
 
     setStatus("eye_status", sensor.eye_status === "open" ? "OPEN" : "CLOSED", sensor.eye_status === "open" ? "safe" : "warning");
-    setStatus("drowsiness_status", isDrowsy ? "DROWSY" : "NORMAL", isDrowsy ? "warning" : "safe");
-    setStatus("accident_status", isAccident ? "ACCIDENT" : "SAFE", isAccident ? "danger" : "safe");
+    setStatus("drowsiness_status", isDrowsy ? "Terdeteksi" : "Tidak Terdeteksi", isDrowsy ? "warning" : "safe");
+    setStatus("accident_status", isAccident ? "Terdeteksi" : "Tidak Terdeteksi", isAccident ? "danger" : "safe");
     setStatus("helmet_activity_status", sensor.helmet_activity_status === "inactive" ? "INACTIVE" : "ACTIVE", sensor.helmet_activity_status === "inactive" ? "danger" : "safe");
 
     const toggle = document.getElementById("system_toggle");
@@ -280,7 +280,7 @@ if (config.isLive) {
             marker.setIcon(defaultIcon);
         }
 
-        marker.bindPopup(`<b>${helmId} (Dummy Worker)</b><br>Status: ${dummy.drowsiness_status ? "Drowsy Warning" : "Normal & Safe"}`);
+        marker.bindPopup(`<b>${helmId} (Dummy Worker)</b><br>Status: ${dummy.drowsiness_status ? "Kantuk Terdeteksi" : "Normal & Aman"}`);
     }
 
     fetchDummyData();

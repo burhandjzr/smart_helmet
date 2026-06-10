@@ -20,10 +20,22 @@
 <nav class="navbar">
     <div class="logo">SMART HELMET</div>
     <div class="nav-links">
-        <a href="index.html">Fleet Dashboard</a>
+        <a href="index.html">Main Dashboard</a>
         <a href="logs.html" class="active">Event Logs</a>
+        <span class="nav-user">👤 admin</span>
+        <a href="#" class="btn-logout" onclick="doLogout()">⏻ Logout</a>
     </div>
 </nav>
+<script>
+    if (sessionStorage.getItem("sh_auth") !== "true") {
+        window.location.replace("login.html");
+    }
+    function doLogout() {
+        sessionStorage.removeItem("sh_auth");
+        sessionStorage.removeItem("sh_user");
+        window.location.replace("login.html");
+    }
+</script>
 
 <div class="container">
     <header>
