@@ -97,8 +97,8 @@ if (document.getElementById("map") && !window.location.search.includes("id=")) {
                 const latestSensor = data[0];
 
                 document.getElementById("h1_id").innerText = latestSensor.device_id || "HELM-01";
-                setStatusUI("h1_drowsy", latestSensor.drowsiness_status ? "DROWSY" : "NORMAL", latestSensor.drowsiness_status ? "warning" : "safe");
-                setStatusUI("h1_accident", latestSensor.accident_status ? "ACCIDENT" : "SAFE", latestSensor.accident_status ? "danger" : "safe");
+                setStatusUI("h1_drowsy", latestSensor.drowsiness_status ? "Terdeteksi" : "Tidak Terdeteksi", latestSensor.drowsiness_status ? "warning" : "safe");
+                setStatusUI("h1_accident", latestSensor.accident_status ? "Terdeteksi" : "Tidak Terdeteksi", latestSensor.accident_status ? "danger" : "safe");
 
                 const systemBadge = document.getElementById("h1_system");
                 if (systemBadge) {
@@ -135,7 +135,7 @@ if (document.getElementById("map") && !window.location.search.includes("id=")) {
                     markers["HELM-01"].setIcon(defaultIcon);
                 }
 
-                markers["HELM-01"].bindPopup(`<b>${latestSensor.device_id || "HELM-01"} (Live)</b><br>Status: ${isAccident ? "Accident" : (isDrowsy ? "Drowsy" : "Normal")}`);
+                markers["HELM-01"].bindPopup(`<b>${latestSensor.device_id || "HELM-01"} (Live)</b><br>Status: ${isAccident ? "Insiden" : (isDrowsy ? "Kantuk" : "Normal")}`);
             }
 
             // Simulasi Pergerakan Mikro Realistis Helm 2 & 3
@@ -147,7 +147,7 @@ if (document.getElementById("map") && !window.location.search.includes("id=")) {
             const h3Lat = BASE_LAT - 0.0002 + (Math.random() - 0.5) * 0.00015;
             const h3Lng = BASE_LNG + 0.0005 + (Math.random() - 0.5) * 0.00015;
             markers["HELM-03"].setLatLng([h3Lat, h3Lng]);
-            markers["HELM-03"].bindPopup(`<b>HELM-03 (Dummy Worker)</b><br>Status: Drowsy Warning`);
+            markers["HELM-03"].bindPopup(`<b>HELM-03 (Dummy Worker)</b><br>Status: Kantuk Terdeteksi`);
 
         } catch (err) {
             console.log("Fleet Fetch Error:", err);
